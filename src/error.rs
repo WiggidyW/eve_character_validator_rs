@@ -1,3 +1,6 @@
+use std::fmt;
+
+#[derive(Debug)]
 pub enum Error {
     ParametersError(hyper::http::Error),
     JwksKeyError(jsonwebtoken::errors::Error),
@@ -9,6 +12,42 @@ pub enum Error {
     OAuthStatusError(OAuthStatusError),
     JwksStatusError(JwksStatusError),
 }
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match &self {
+            Self::ParametersError(e) => {
+                write!(f, "ParametersError: {}", e)
+            },
+            Self::JwksKeyError(e) => {
+                write!(f, "JwksKeyError: {}", e)
+            },
+            Self::JwksParseError(e) => {
+                write!(f, "JwksParseError: {:?}", e)
+            },
+            Self::JkwsDecodeError(e) => {
+                write!(f, "JkwsDecodeError: {}", e)
+            },
+            Self::OAuthParseError(e) => {
+                write!(f, "OAuthParseError: {:?}", e)
+            },
+            Self::OAuthGetResponseError(e) => {
+                write!(f, "OAuthGetResponseError: {:?}", e)
+            }
+            Self::JwksGetResponseError(e) => {
+                write!(f, "JwksGetResponseError: {:?}", e)
+            }
+            Self::OAuthStatusError(e) => {
+                write!(f, "OAuthStatusError: {:?}", e)
+            }
+            Self::JwksStatusError(e) => {
+                write!(f, "JwksStatusError: {:?}", e)
+            }
+        }
+    }
+}
+
+impl std::error::Error for Error {}
 
 impl From<JwksStatusError> for Error {
     fn from(value: JwksStatusError) -> Self {
@@ -46,10 +85,13 @@ impl From<OAuthParseError> for Error {
     }
 }
 
+#[derive(Debug)]
 pub struct JwksStatusError(StatusError);
 
+#[derive(Debug)]
 pub struct OAuthStatusError(StatusError);
 
+#[derive(Debug)]
 pub struct StatusError(hyper::StatusCode);
 
 impl StatusError {
@@ -62,10 +104,13 @@ impl StatusError {
     }
 }
 
+#[derive(Debug)]
 pub struct JwksGetResponseError(GetResponseError);
 
+#[derive(Debug)]
 pub struct OAuthGetResponseError(GetResponseError);
 
+#[derive(Debug)]
 pub struct GetResponseError(hyper::Error);
 
 impl GetResponseError {
@@ -74,6 +119,7 @@ impl GetResponseError {
     }
 }
 
+#[derive(Debug)]
 pub enum JwksParseError {
     ParseError(ParseError),
     InvalidKeyError(jsonwebtoken::errors::Error),
@@ -86,6 +132,7 @@ impl From<ParseError> for JwksParseError {
     }
 }
 
+#[derive(Debug)]
 pub struct OAuthParseError(ParseError);
 
 impl OAuthParseError {
@@ -94,6 +141,7 @@ impl OAuthParseError {
     }
 }
 
+#[derive(Debug)]
 pub struct ParseError(serde_json::Error);
 
 impl ParseError {
@@ -102,6 +150,7 @@ impl ParseError {
     }
 }
 
+#[derive(Debug)]
 pub enum SendError {
     GetResponseError(GetResponseError),
     StatusError(StatusError),
