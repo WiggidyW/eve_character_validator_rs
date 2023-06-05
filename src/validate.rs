@@ -10,13 +10,15 @@ pub struct Response {
 }
 
 pub async fn validate<
+    's,
+    S: AsRef<&'s str>,
     C: hyper::client::connect::Connect + Clone + Send + Sync + 'static,
 >(
     hyper_client: &hyper::client::Client<C, hyper::body::Body>,
     jwks: &JWKS,
     refresh_token: &str,
     client_id: &str,
-    mut characters: impl Iterator<Item = &str>,
+    mut characters: impl Iterator<Item = S> + 's,
 ) -> Result<Response, Error> {
     let oauth_rep = AuthenticationResponse::new(
         hyper_client,
@@ -27,6 +29,6 @@ pub async fn validate<
     let name = jwks.get_name(&oauth_rep.jwt)?;
     Ok(Response {
         refresh_token: oauth_rep.refresh_token,
-        valid: characters.find(|&c| c == name).is_some(),
+        valid: characters.find(|c| c.as_ref() == &name).is_some(),
     })
 }
