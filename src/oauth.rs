@@ -7,6 +7,7 @@ use serde::Deserialize;
 
 #[derive(Deserialize)]
 pub struct AuthenticationResponse {
+    #[serde(rename(deserialize = "access_token"))]
     pub jwt: String,
     pub refresh_token: String,
 }
